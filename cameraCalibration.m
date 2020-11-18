@@ -128,3 +128,6 @@ center1_world = [center1_world 0];
 distanceToCamera = norm(center1_world - cameraLocation);
 fprintf('Distance from the camera to the Marker = %0.2f mm\n', ...
     distanceToCamera);
+
+%% References
+% Z. Zhang. A flexible new technique for camera calibration. IEEE Transactions on Pattern Analysis and Machine Intelligence, 22(11):1330-1334, 2000.
