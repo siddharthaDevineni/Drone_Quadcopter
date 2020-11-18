@@ -2,11 +2,12 @@ clear all
 clc
 close all
 %% Prepare Calibration Images
-numImages = 26;
+numImages = 23; 
 files = cell(1, numImages);
+set_number = '7thset';
 for i = 1:numImages
     files{i} = fullfile('c:\','Users', 'Mahadeva', 'Desktop', 'QuadCopter', ...
-        'Drone Images', '6thset', sprintf('image%d.png', i));
+        'Drone Images', set_number, sprintf('image%d.png', i));
 end
 
 % Display one of the calibration images
@@ -34,7 +35,7 @@ figure; showReprojectionErrors(cameraParams);
 title('Reprojection Errors');
 %% Read the Image of Objects to Be Measured
 imOrig = imread(fullfile('c:\','Users', 'Mahadeva', 'Desktop', 'QuadCopter', ...
-        'Drone Images', '6thset', 'image23.png'));
+        'Drone Images', set_number, 'image1.png'));
 figure; imshow(imOrig, 'InitialMagnification', magnification);
 title('Input Image');
 
@@ -54,9 +55,9 @@ saturation = imHSV(:, :, 2);
 
 % Threshold the image
 t = graythresh(saturation);
-imCoin = (saturation > t);
+imMarker = (saturation > t);
 
-figure; imshow(imCoin, 'InitialMagnification', magnification);
+figure; imshow(imMarker, 'InitialMagnification', magnification);
 title('Segmented Marker');
 
 %% Detect Marker
@@ -65,19 +66,19 @@ blobAnalysis = vision.BlobAnalysis('AreaOutputPort', true,...
     'CentroidOutputPort', false,...
     'BoundingBoxOutputPort', true,...
     'MinimumBlobArea', 1000, 'ExcludeBorderBlobs', true);
-[areas, boxes] = step(blobAnalysis, imCoin);
+[areas, boxes] = step(blobAnalysis, imMarker);
 
 % Sort connected components in descending order by area
 [~, idx] = sort(areas, 'Descend');
 
-% Get the two largest components.
-boxes = double(boxes(idx(1:2), :));
+% Get the largest component.
+boxes = double(boxes(idx(1), :));
 
 % Reduce the size of the image for display.
 scale = magnification / 100;
 imDetectedCoins = imresize(im, scale);
 
-% Insert labels for the coins.
+% Insert label for the marker.
 imDetectedCoins = insertObjectAnnotation(imDetectedCoins, 'rectangle', ...
     scale * boxes, 'marker');
 figure; imshow(imDetectedCoins);
@@ -112,7 +113,7 @@ worldPoints1 = pointsToWorld(cameraParams, R, t, imagePoints1);
 % Compute the diameter of the coin in millimeters.
 d = worldPoints1(2, :) - worldPoints1(1, :);
 diameterInMillimeters = hypot(d(1), d(2));
-fprintf('Measured side of Marker = %0.2f mm\n', diameterInMillimeters);
+fprintf('Measured dimension of Square Marker = %0.2f mm\n', diameterInMillimeters);
 %% Measure the Distance to The Marker
 % Compute the center of the first coin in the image.
 center1_image = box1(1:2) + box1(3:4)/2;
@@ -130,4 +131,5 @@ fprintf('Distance from the camera to the Marker = %0.2f mm\n', ...
     distanceToCamera);
 
 %% References
+% Matlab
 % Z. Zhang. A flexible new technique for camera calibration. IEEE Transactions on Pattern Analysis and Machine Intelligence, 22(11):1330-1334, 2000.
