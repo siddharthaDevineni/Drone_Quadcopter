@@ -110,12 +110,12 @@ imagePoints1 = [box1(1:2); ...
 % Get the world coordinates of the corners            
 worldPoints1 = pointsToWorld(cameraParams, R, t, imagePoints1);
 
-% Compute the diameter of the coin in millimeters.
+% Compute the dimension of the marker in millimeters.
 d = worldPoints1(2, :) - worldPoints1(1, :);
 diameterInMillimeters = hypot(d(1), d(2));
 fprintf('Measured dimension of Square Marker = %0.2f mm\n', diameterInMillimeters);
 %% Measure the Distance to The Marker
-% Compute the center of the first coin in the image.
+% Compute the center of the marker in the image.
 center1_image = box1(1:2) + box1(3:4)/2;
 
 % Convert to world coordinates.
